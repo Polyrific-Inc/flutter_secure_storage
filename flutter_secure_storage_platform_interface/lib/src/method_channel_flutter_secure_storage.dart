@@ -7,19 +7,17 @@ const EventChannel _eventChannel =
     EventChannel('plugins.it_nomads.com/flutter_secure_storage/events');
 
 class MethodChannelFlutterSecureStorage extends FlutterSecureStoragePlatform {
-  @override
   Stream<bool> get onCupertinoProtectedDataAvailabilityChanged => _eventChannel
       .receiveBroadcastStream()
       .where((event) => event is bool)
       .map((event) => event as bool);
 
-  @override
-  Future<bool> isCupertinoProtectedDataAvailable() async {
-    if (!kIsWeb && Platform.isIOS) {
-      (await _channel.invokeMethod<bool>('isProtectedDataAvailable'))!;
+  Future<bool?> isCupertinoProtectedDataAvailable() async {
+    if (kIsWeb || !(Platform.isIOS || Platform.isMacOS)) {
+      return null;
     }
-
-    return Future.value(true);
+    return (await _channel.invokeMethod<bool>('isProtectedDataAvailable')) ??
+        false;
   }
 
   @override

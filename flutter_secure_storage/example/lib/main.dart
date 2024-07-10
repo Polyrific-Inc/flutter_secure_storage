@@ -57,7 +57,14 @@ class ItemsWidgetState extends State<ItemsWidget> {
   }
 
   Future<void> _isProtectedDataAvailable() async {
-    await _storage.isCupertinoProtectedDataAvailable();
+    final scaffold = ScaffoldMessenger.of(context);
+    final result = await _storage.isCupertinoProtectedDataAvailable();
+    scaffold.showSnackBar(
+      SnackBar(
+        content: Text('Protected data available: $result'),
+        backgroundColor: result != null && result ? Colors.green : Colors.red,
+      ),
+    );
   }
 
   Future<void> _addNewItem() async {
@@ -221,10 +228,9 @@ class ItemsWidgetState extends State<ItemsWidget> {
         }
         break;
       case _ItemActions.containsKey:
-        if (!context.mounted) return;
         final key = await _displayTextInputDialog(context, item.key);
         final result = await _storage.containsKey(key: key);
-        if (!mounted) return;
+        if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Contains Key: $result, key checked: $key'),
@@ -233,11 +239,10 @@ class ItemsWidgetState extends State<ItemsWidget> {
         );
         break;
       case _ItemActions.read:
-        if (!context.mounted) return;
         final key = await _displayTextInputDialog(context, item.key);
         final result =
             await _storage.read(key: key, aOptions: _getAndroidOptions());
-        if (!mounted) return;
+        if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('value: $result'),
